@@ -36,7 +36,7 @@ class ChatServiceTest {
         val service = ChatService()
         service.sendMessage(1, 2, "Тестовое сообщение 1")
         service.sendMessage(2, 1, "Тестовое сообщение 2")
-        service.getMessagesFromChat(2, 0)
+        service.getMessagesFromChat(2, 0, 2)
     }
 
     @Test
@@ -50,7 +50,7 @@ class ChatServiceTest {
 
         service.sendMessage(msg1.senderId, msg1.receiverId, msg1.text)
         service.sendMessage(msg2.senderId, msg2.receiverId, msg2.text)
-        val result = service.getMessagesFromChat(1, 0)
+        val result = service.getMessagesFromChat(1, 0, 2)
 
         assertEquals(result, expected)
     }
@@ -66,7 +66,7 @@ class ChatServiceTest {
 
         service.sendMessage(msg1.senderId, msg1.receiverId, msg1.text)
         service.sendMessage(msg2.senderId, msg2.receiverId, msg2.text)
-        val result = service.getMessagesFromChat(1, 0)
+        val result = service.getMessagesFromChat(1, 0, 2)
 
         assertEquals(result, expected)
     }

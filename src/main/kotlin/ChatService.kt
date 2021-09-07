@@ -6,16 +6,23 @@ class ChatService {
     private var msgId = 0
 
     fun getUnreadChatsCount(userId: Int): Int {
-        return chats.filter { (it.senderId == userId || it.receiverId == userId) && it.haveUnreadMsg }.size
+        return chats
+            .filter { (it.senderId == userId || it.receiverId == userId) && it.haveUnreadMsg }.size
     }
 
     fun getChats(id: Int): List<Chat> {
-        return chats.filter { (it.senderId == id || it.receiverId == id) && !it.empty }
+        return chats
+            .filter { (it.senderId == id || it.receiverId == id) && !it.empty }
     }
 
-    fun getMessagesFromChat(chatId: Int, lastMessageId: Int): List<Message> {
-        val chat = chats.find { it.chatId == chatId } ?: throw ChatNotFoundException()
-        val messageList = chat.messages.takeLastWhile { lastMessageId != it.msgId }
+    fun getMessagesFromChat(chatId: Int, lastMessageId: Int, count: Int): List<Message> {
+        val chat = chats
+            .find { it.chatId == chatId } ?: throw ChatNotFoundException()
+
+        val messageList = chat.messages
+            .takeLastWhile { lastMessageId != it.msgId }
+            .take(count)
+
         messageList.forEach { it.isReaded = true }
         return messageList
     }
@@ -23,9 +30,9 @@ class ChatService {
     fun sendMessage(senderId: Int, receiverId: Int, text: String) {
         msgId++
         val message = Message(msgId, senderId, receiverId, text)
-        val chat =
-            chats.find { it.senderId == senderId || it.senderId == receiverId && it.receiverId == receiverId || it.receiverId == senderId }
-                ?: createChat(senderId, receiverId)
+        val chat = chats
+            .find { it.senderId == senderId && it.receiverId == receiverId || it.senderId == receiverId && it.receiverId == senderId }
+            ?: createChat(senderId, receiverId)
         chat.messages.add(message)
         if (chat.empty) {
             chat.empty = false
@@ -34,7 +41,8 @@ class ChatService {
     }
 
     fun deleteLastMessage(chatId: Int) {
-        val chat = chats.find { it.chatId == chatId } ?: throw ChatNotFoundException()
+        val chat = chats
+            .find { it.chatId == chatId } ?: throw ChatNotFoundException()
 
         if (chat.empty) {
             println("Чат пуст, удалять нечего")
@@ -52,12 +60,13 @@ class ChatService {
     fun createChat(senderId: Int, receiverId: Int): Chat {
         chatId++
         val chat = Chat(chatId, senderId, receiverId)
-        chats += chat
+        chats.add(chat)
         return chats.last()
     }
 
     fun deleteChat(chatId: Int) {
-        val chat = chats.find { it.chatId == chatId } ?: throw ChatNotFoundException()
+        val chat = chats
+            .find { it.chatId == chatId } ?: throw ChatNotFoundException()
         chat.messages.clear()
         chat.empty = true
         println("Чат удален")
